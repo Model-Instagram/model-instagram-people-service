@@ -1,25 +1,13 @@
-const faker = require('faker');
-const fs = require('fs');
-
+const { getUserProfile } = require('./getUserProfile');
 const { followGenerator } = require('./followGenerator');
 
 const getBatchOfUsers = (popSize, userId) => {
+  const startTime = Date.now();
+  console.log('     starting userBatch generation');
   let newUsers = [];
 
   const generateNewUserAndPush = (currentUserId) => {
-    const user = {
-      userId: currentUserId,
-      age: Math.floor(Math.random() * 70) + 18,
-      gender: Math.random() > 0.5 ? 'M' : 'F',
-      lastName: faker.fake('{{name.lastName}}'),
-      firstName: faker.fake('{{name.firstName}}'),
-      email: faker.fake('{{internet.email}}'),
-      userName: faker.fake('{{internet.userName}}'),
-      profilePicture: faker.fake('{{image.imageUrl}}'),
-      followers: followGenerator(),
-      followees: followGenerator(),
-    };
-
+    const user = getUserProfile(currentUserId);
     newUsers.push(user);
   };
 
@@ -27,6 +15,7 @@ const getBatchOfUsers = (popSize, userId) => {
     generateNewUserAndPush(Number(userId) + i);
   }
 
+  console.log('     finished userBatch generation ', Date.now() - startTime);
   return newUsers;
 };
 
