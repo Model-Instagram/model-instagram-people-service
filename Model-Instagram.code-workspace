@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "/Users/brianchoe/Documents/coding/misc-toy-problems"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "/Users/brianchoe/Documents/coding/docker-play"
+		},
+		{
+			"path": "/Users/brianchoe/Documents/Visibook-code"
+		},
+		{
+			"path": "/Users/brianchoe/Documents/coding/hrsf83-toy-problems"
+		},
+		{
+			"path": "/Users/brianchoe/Documents/coding/interview-prep"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"editorCursor.foreground": "#ff0000"
+		}
+	}
+}

@@ -5,15 +5,15 @@ const followGenerator = () => {
   const maxFollow = 10000000;
   const maxNum = 400;
   let num = Math.round(Math.random() * maxNum);
+  let friendsObj = {};
   let friends = [];
   let newFriend;
 
   for (let i = 0; i < num; i++) {
     newFriend = Math.round(Math.random() * maxFollow);
-    if (!friends.includes(newFriend)) {
-      friends.push(newFriend);
-    }
+    friendsObj[newFriend] = 1;
   }
+  friends = Object.keys(friendsObj);
   return friends;
 };
 

@@ -1,4 +1,5 @@
 const nr = require('newrelic');
+const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {
@@ -11,6 +12,7 @@ const { getUserProfile } = require('../helpers/getUserProfile');
 const { getCommonElements } = require('../helpers/getCommonElements');
 const fs = require('fs');
 
+dotenv.config();
 const service = express();
 const port = 8080;
 
@@ -76,8 +78,8 @@ service.put('/user/add', (req, res) => {
 });
 
 service.put('/bulkuser/add', (req, res) => {
-  const volOfUsersToAdd = 1000000;
-  const batchSize = 20000;
+  const volOfUsersToAdd = 100000;
+  const batchSize = 100;
 
   const startTime = Date.now();
 
@@ -116,15 +118,19 @@ service.put('/bulkuser/add', (req, res) => {
 });
 
 service.put('/streamuser/add', (req, res) => {
-  const volOfUsersToAdd = 10;
+  let volOfUsersToAdd = 10000;
 
-  // get last userId count
+  if (process.env.NODE_ENV === 'docker' || process.env.NODE_ENV === 'test') {
+    volOfUsersToAdd = 100;
+  }
 
   const startTime = Date.now();
 
+  console.log('---- testing development on docker ----');
   console.log('environment variables ', process.env.NODE_ENV);
+
   let lastUserId = Number(fs.readFileSync('./simulator/lastUserId.txt', 'utf8'));
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'docker') {
     lastUserId = 0;
   }
   console.log('First user ID is ', lastUserId);
@@ -138,17 +144,22 @@ service.put('/streamuser/add', (req, res) => {
         if (lastUserId < maxUserId) {
           insertUserToDb(lastUserId);
         } else if (lastUserId === maxUserId) {
-          fs.writeFile('./simulator/lastUserId.txt', lastUserId, (err) => {
-            if (err) throw err;
-            console.log('lastUserId.txt file has been updated with ', lastUserId);
+          if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'docker') {
             console.log(Date.now() - startTime, ' ms to complete operation');
             res.send('successful stream write');
-          });
+          } else {
+            fs.writeFile('./simulator/lastUserId.txt', lastUserId, (err) => {
+              if (err) throw err;
+              console.log('lastUserId.txt file has been updated with ', lastUserId);
+              console.log(Date.now() - startTime, ' ms to complete operation');
+              res.send('successful stream write');
+            });
+          }
         }
       })
       .catch(err => console.log('Problem adding to DB ', err));
   };
 
   insertUserToDb(lastUserId);
-
+  // res.send('changed development');
 });
